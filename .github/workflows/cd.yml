@@ -1,4 +1,4 @@
-name: CD Gitops
+name: CDGitops
 
 on:
   push:
@@ -8,9 +8,11 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Build and push image to Dockerhub
         uses: docker/build-push-action@v1.1.0
         with:
@@ -18,6 +20,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ secrets.DOCKERHUB_USERNAME }}/gitopsmnikkel
           tags: ${{ github.sha }}, latest
+
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v1
         with:
@@ -25,21 +28,19 @@ jobs:
 
       - name: Update Kubernetes resources
         env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
           cd k8s
-          kustomize edit set image goserver=$DOCKERHUB_USERNAME/gitopsmnikkel:$GITHUB_SHA
+          kustomize edit set image goserver=$DOCKER_USERNAME/gitopsmnikkel:$GITHUB_SHA
 
-      - name: Commit Changes
+      - name: Commit
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          git commit -m "Update image to $DOCKERHUB_USERNAME/gitopsmnikkel:$GITHUB_SHA"
-          git push
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "Bump docker version"
 
-      # - name: Push Changes to GitOps Repo
-      #   uses: ad-m/github-push-action@master
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     repository: MaNikkel/gitopsmnikkel
+      - name: Push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repository: MaNikkel/gitops
