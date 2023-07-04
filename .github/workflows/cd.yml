@@ -37,7 +37,7 @@ jobs:
           git add .
           git commit -m "Update image to $DOCKERHUB_USERNAME/gitopsmnikkel:$GITHUB_SHA"
 
-      - name: Push Changes
+      - name: Push Changes to GitOps Repo
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
