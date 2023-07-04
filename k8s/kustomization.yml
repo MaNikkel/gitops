@@ -8,4 +8,4 @@ resources:
 images:
 - name: goserver
   newName: mnikkel/gitopsmnikkel
-  newTag: 10b977b22f9416823d800bab10523fa2c0f3a80a
+  newTag: ad988e084ed0cd7dad5775b6a43c8a9c297f39b1
